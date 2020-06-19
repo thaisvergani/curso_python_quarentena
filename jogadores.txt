@@ -1,2 +1,2 @@
-thais=1
 maria=4
+thais=2

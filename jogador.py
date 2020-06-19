@@ -1,38 +1,32 @@
+import sys
+
 class Jogador:
-    """
-    Criar um novo arquivo com a classe Jogador
-    - a classe Jogador deve possuir um atributo para a pontuação 
-         e um para o nome.
-    - criar um método de classe para buscar todos os jogadores do arquivo
-       e retornar uma lista de objetos do tipo Jogador.
-    - criar um método de classe para buscar o jogador pelo nome 
-        recebe por parâmetro a string do nome
-        retorna um novo objeto do tipo jogador 
-    """
-   
-    # jogadores = list()
+
     jogadores = []
 
     def __init__(self, nome, pontuacao):
         self.nome = nome
         self.pontuacao = pontuacao
         type(self).jogadores.append(self)
+        type(self).jogadores.sort(key=lambda obj: obj.nome)
+        # have a key parameter to specify a function to be called 
+        # on each list element prior to making comparisons.
 
     @classmethod
-    def buscar_jogadores(cls, filename):            
-        ''' metodo de classe para buscar todos os jogadores  
-         do arquivo 
-        '''
+    def carregar_jogadores(cls, filename):
         try:
-            with open(filename, 'rt') as file:
-                data = file.read()
-        except IOError:
-            print('não foi possivel abrir o arquivo')
+            with open(filename, 'r', encoding='utf-8') as file:
+                linhas = file.read().splitlines()
+            
+            for linha in linhas:
+                linha.replace(' ', '')
+                if len(linha) > 0:
+                    nome, pontuacao = linha.split('=')
+                    jogador = Jogador(nome, int(pontuacao))
 
-        jogadores = data.split('\n')
-        for j in jogadores:
-            nome, pontuacao = j.split('=')
-            novo_j = Jogador(nome, int(pontuacao))
+        except IOError as e:
+            print('nao foi possivel abrir o arquivo')
+            sys.exit(1)
 
     @classmethod
     def buscar_jogador(cls, nome):
@@ -40,3 +34,24 @@ class Jogador:
             if obj.nome == nome:
                 return obj
     
+    @classmethod
+    def salvar_jogadores(cls, filename):
+        try:
+            with open(filename, 'w', encoding='utf-8') as file:
+                for jogador in cls.jogadores:
+                    file.write(jogador.nome)
+                    file.write('=')
+                    file.write(str(jogador.pontuacao))
+                    file.write('\n')
+        except IOError as identifier:
+            print('nao foi possivel escrever o arquivo')
+            sys.exit(1)
+
+    @classmethod
+    def mostrar_pontuacao(cls):
+        print('\n')
+        
+        for jogador in Jogador.jogadores:
+            print("|{:<10} |{}|".format(jogador.nome, jogador.pontuacao))
+    
+        print('\n')

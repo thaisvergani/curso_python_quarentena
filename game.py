@@ -1,4 +1,5 @@
-import random
+import random, sys
+from jogador import Jogador
 
 def buscar_palavras_do_arquivo(
         filename='forca_python.txt',
@@ -13,14 +14,24 @@ def buscar_palavras_do_arquivo(
             data = file.read()
     except IOError:
         print('não foi possivel abrir o arquivo')
-
+        sys.exit(1)
     a = data.split('\n')
 
     return a
 
-def jogar():
-    palavras = buscar_palavras_do_arquivo(filename='forca_python.txt')
+def carregar_jogador():
+    nome = input('digite o seu nome: ')
+    
+    jogador = Jogador.buscar_jogador(nome)
+    if jogador is None:
+        jogador = Jogador(nome)
 
+    return jogador
+
+def jogar():
+    jogador = carregar_jogador()
+   
+    palavras = buscar_palavras_do_arquivo(filename='forca_python.txt')
     palavra = random.choice(palavras).upper()
     codificada = list('_' * len(palavra))
 
@@ -42,6 +53,7 @@ def jogar():
             )
 
             if ''.join(codificada) == palavra:
+                jogador.pontuacao += 1
                 print('Ganhou :)')
                 break
 
@@ -52,4 +64,4 @@ def jogar():
             if tentativas >= 6:
                 print('Morreu')
                 break
-            
+
